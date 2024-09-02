@@ -16,3 +16,12 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+java {
+    sourceCompatibility = JavaVersion.VERSION_19
+    targetCompatibility = JavaVersion.VERSION_19
+}
+buildscript {
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.0.2'
+    }
+}
