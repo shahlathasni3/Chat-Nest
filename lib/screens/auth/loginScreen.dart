@@ -26,7 +26,7 @@ class _loginScreenState extends State<loginScreen> {
   // Animation
   @override
   void initState() {
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
      setState(() {
        isAnimate = true;
      });
@@ -38,13 +38,23 @@ class _loginScreenState extends State<loginScreen> {
   handleGooglebtnClick() {
     // for showing circular progressbar
     Dialogues.showProgressBar(context);
-    signInWithGoogle().then((user){
+    signInWithGoogle().then((user) async{
+      // for hiding progress bar
       Navigator.pop(context);
 
       if(user != null){
         log('\nUser: ${user.user}');
         log('\nUserAdditionalInfo: ${user.additionalUserInfo}');
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+
+        if((await APIs.userExists())){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+        }
+        else{
+         await APIs.createUser().then((value){
+           Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+         });
+        }
+
       }
 
     });
@@ -82,8 +92,8 @@ class _loginScreenState extends State<loginScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,// Remove back button
-        leading: Icon(CupertinoIcons.home),
-        title: Text("Chat Nest"),
+        leading: const Icon(CupertinoIcons.home),
+        title: const Text("Chat Nest"),
       ),
       body: Stack(
         children: [
@@ -91,7 +101,7 @@ class _loginScreenState extends State<loginScreen> {
             top: mq.height * .15,
             right: isAnimate ? mq.width * .25 : -mq.width * .5,
             width: mq.width * .5,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
             child: Image.asset("images/icon.png"),
           ),
           Positioned(
@@ -102,13 +112,13 @@ class _loginScreenState extends State<loginScreen> {
             child:ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green.shade500,
-                shape: StadiumBorder(),
+                shape: const StadiumBorder(),
                 elevation: 1
               ),
               onPressed: (){
                 handleGooglebtnClick();
               }, icon: Image.asset("images/google.png"),
-              label: RichText(text: TextSpan(
+              label: RichText(text: const TextSpan(
                 style: TextStyle(color: Colors.black,fontSize: 18),
                 children: [
                 TextSpan(text: "Login with "),

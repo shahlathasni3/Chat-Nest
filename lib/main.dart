@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       title: 'Chat Nest',
       theme: ThemeData(
 
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           centerTitle: true,
           elevation: 1,
           iconTheme: IconThemeData(color: Colors.black),
@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.white,
         ),
       ),
-      home: SplashScreen(),
+      home: const SplashScreen(),
     );
   }
 }
