@@ -32,7 +32,7 @@ class _Cat_user_cardState extends State<Cat_user_card> {
               height: mq.height*.055,
               imageUrl: widget.user.image,
               // placeholder: (context, url) => CircularProgressIndicator(),
-              errorWidget: (context, url, error) => CircleAvatar(child: Icon(CupertinoIcons.person),),
+              errorWidget: (context, url, error) => const CircleAvatar(child: Icon(CupertinoIcons.person),),
             ),
           ),
           // user name

@@ -30,19 +30,22 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-#    for integrating firebase
+  # for integrating firebase
   firebase_core: ^3.3.0
-#  for handling firebase authentication
+  # for handling firebase authentication
   firebase_auth: ^5.2.0
-#  for handling google signin
+  # for handling google signin
   google_sign_in: ^6.2.1
-#accessing cloud firestoire database
+  # accessing cloud firestoire database
   cloud_firestore: ^5.3.0
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  #  cupertino icoins
   cupertino_icons: ^1.0.8
+  # for showing network images
   cached_network_image: ^3.4.0
+  # for picking images
+  image_picker: ^1.1.2
+  # for accessing firebase storage for uploading files
+  firebase_storage: ^12.2.0
 
 dev_dependencies:
   flutter_test:

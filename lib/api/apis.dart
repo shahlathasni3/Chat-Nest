@@ -1,14 +1,16 @@
-import 'dart:math';
 
 import 'package:chat_nest/models/chat_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class APIs {
   // authentication
   static FirebaseAuth auth = FirebaseAuth.instance;
   // accessing cloud firesteore database
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
+  // accessing firebase storage
+  static FirebaseStorage storage = FirebaseStorage.instance;
 
   // for storing self information
   static late ChatUser me;
@@ -35,9 +37,6 @@ class APIs {
     });
   }
 
-
-
-
   // for creating a new user
   static Future<void> createUser() async {
     final time = DateTime.now().millisecondsSinceEpoch.toString();
@@ -59,5 +58,12 @@ class APIs {
   // for all getting all users from database
   static Stream<QuerySnapshot<Map<String,dynamic>>> getAllUsers(){
     return firestore.collection('user').where('id' , isNotEqualTo: user.uid).snapshots();
+  }
+  // for updating user information
+  static Future<void> updateUserInfo() async {
+    await firestore.collection('user').doc(user.uid).update({
+      'name' : me.name,
+      'about' : me.about,
+    });
   }
 }

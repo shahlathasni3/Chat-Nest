@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_nest/helpers/dialogues.dart';
@@ -7,6 +8,7 @@ import 'package:chat_nest/screens/auth/loginScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../api/apis.dart';
 import '../main.dart';
@@ -26,6 +28,8 @@ class profileScreen extends StatefulWidget {
 class _profileScreenState extends State<profileScreen> {
 
   final formKey = GlobalKey<FormState>();
+
+  String? images;
 
   @override
   Widget build(BuildContext context) {
@@ -67,30 +71,45 @@ class _profileScreenState extends State<profileScreen> {
               child: Column(
                 children: [
                   SizedBox(width: mq.width,height: mq.height*.03,),
-                  
-                  Column(
+                  // user profile picture
+                  Stack(
                     children: [
-                      Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(mq.height*.1),
-                            child: CachedNetworkImage(
-                              width: mq.height*.2,
-                              height: mq.height*.2,
-                              fit: BoxFit.fill,
-                              imageUrl: widget.user.image,
-                              // placeholder: (context, url) => CircularProgressIndicator(),
-                              errorWidget: (context, url, error) => CircleAvatar(child: Icon(CupertinoIcons.person),),
-                            ),
-                          ),
-                          Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: MaterialButton(onPressed: (){},elevation: 1,color:Colors.white,child: Icon(Icons.edit,color: Colors.green,),shape: CircleBorder(),))
-                    
-                        ]
-                      ),
-                      ],
+                      // profile picture
+                      images != null ?
+                          // local image
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(mq.height*.1),
+                        child: Image.file(
+                          File(images!),
+                          width: mq.height*.2,
+                          height: mq.height*.2,
+                          fit: BoxFit.cover,
+                      ),)
+
+                      :
+
+                      // image from server
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(mq.height*.1),
+                        child: CachedNetworkImage(
+                          width: mq.height*.2,
+                          height: mq.height*.2,
+                          fit: BoxFit.cover,
+                          imageUrl: widget.user.image,
+                          errorWidget: (context,url,error)=>CircleAvatar(child: Icon(CupertinoIcons.person),),
+                        ),),
+
+
+
+
+                      Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: MaterialButton(onPressed: (){
+                            showBottomsheet();
+                          },elevation: 1,color:Colors.white,child: Icon(Icons.edit,color: Colors.green,),shape: CircleBorder(),))
+
+                    ]
                   ),
                   
                   SizedBox(height: mq.height*.03,),
@@ -128,7 +147,9 @@ class _profileScreenState extends State<profileScreen> {
                       onPressed: (){
                       if(formKey.currentState!.validate()){
                         formKey.currentState!.save();
-                        log('Inside validator');
+                        APIs.updateUserInfo().then((value){
+                          Dialogues.showSnackbar(context, "Profile updated successfully!");
+                        });
                       }
                       },
                       icon: Icon(Icons.edit,size: 27,),
@@ -141,5 +162,69 @@ class _profileScreenState extends State<profileScreen> {
         ),
       ),
     );
+  }
+
+  // bottom sheet for picking a profile picture for user
+  void showBottomsheet(){
+    showModalBottomSheet(
+        context: context,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20),topRight: Radius.circular(20))),
+        builder: (_){
+        return ListView(
+          shrinkWrap: true,
+          padding: EdgeInsets.only(top: mq.height*.03,bottom: mq.height*.05),
+          children: [
+            Text('Pick Profile Picture.', textAlign: TextAlign.center,style: TextStyle(fontSize: 20,fontWeight: FontWeight.w500),),
+            // buttons
+            SizedBox(height: mq.height*.02,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // pick from gallery button
+                ElevatedButton(
+                    onPressed: () async {
+                      final ImagePicker picker = ImagePicker();
+                      // Pick an image.
+                      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+                      if(image != null){
+                        log('Image path : ${image.path} -- MimeType: ${image.mimeType}');
+
+                        setState(() {
+                          images = image.path;
+                        });
+                        // diding bottom sheet
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white, shape: CircleBorder(), fixedSize: Size(mq.width*.3, mq.height*.15)),
+                    child: Image.asset('images/addImage.png')
+                ),
+                // take picture from camera button
+                ElevatedButton(
+                    onPressed: () async {
+                      final ImagePicker picker = ImagePicker();
+                      // Pick an image.
+                      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+
+                      if(image != null){
+                        log('Image path : ${image.path}');
+
+                        setState(() {
+                          images = image.path;
+                        });
+                        // diding bottom sheet
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white, shape: CircleBorder(), fixedSize: Size(mq.width*.3, mq.height*.15)),
+                    child: Image.asset('images/addCamera.jpg')
+                ),
+              ],
+            )
+          ],
+        );
+    });
+
   }
 }
