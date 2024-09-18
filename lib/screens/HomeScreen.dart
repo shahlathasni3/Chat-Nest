@@ -2,12 +2,14 @@ import 'package:chat_nest/models/chat_user.dart';
 import 'package:chat_nest/screens/profile_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../api/apis.dart';
 import '../main.dart';
 import '../widgets/chat_user_card.dart';
 
+//home screen -- where all available contacts are shown
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -35,17 +37,17 @@ class _HomeScreenState extends State<HomeScreen> {
       // for hiding keyboard
       onTap: () => FocusScope.of(context).unfocus(),
       child: WillPopScope(
-        onWillPop: (){
-          if(isSearching){
+        //if search is on & back button is pressed then close search
+        //or else simple close current screen on back button click
+        onWillPop: () {
+          if (isSearching) {
             setState(() {
               isSearching = !isSearching;
             });
             return Future.value(false);
-          }
-          else{
+          } else {
             return Future.value(true);
           }
-
         },
         child: Scaffold(
           appBar: AppBar(
@@ -60,29 +62,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     onChanged: (val){
                       // search logic
                       SearchList.clear();
+                      val = val.toLowerCase();
                       for(var i in list){
-                        if(i.name.toLowerCase().contains(val.toLowerCase()) ||
-                            i.email.toLowerCase().contains(val.toLowerCase())){
-                                SearchList.add(i);
+                        if (i.name.toLowerCase().contains(val) ||
+                        i.email.toLowerCase().contains(val)) {
+                        SearchList.add(i);
                         }
-                        setState(() {
-                          SearchList;
-                        });
                       }
+                      setState(() => SearchList);
                     },
                   )
                 : Text("Chat Nest"),
             actions: [
               // serach user button
               IconButton(
-                  onPressed: () {
-                    setState(() {
-                      isSearching = !isSearching;
-                    });
-                  },
+                  tooltip: 'Search',
+                  onPressed: () => setState(() => isSearching = !isSearching),
                   icon: Icon(isSearching
                       ? CupertinoIcons.clear_circled_solid
-                      : Icons.search)),
+                      : CupertinoIcons.search)),
 
               // more features button
               IconButton(
@@ -134,9 +132,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           physics: const BouncingScrollPhysics(),
                           itemBuilder: (context, index) {
                             return Cat_user_card(
-                              user: isSearching ? SearchList [index]:list[index],
+                              user: isSearching ? SearchList[index]:list[index],
                             );
-
+                          // return Text('Name:${list[index]}');
                           });
                     } else {
                       return Center(
@@ -146,7 +144,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ));
                     }
                 }
-              }),
+              },
+          ),
         ),
       ),
     );
