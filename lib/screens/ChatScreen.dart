@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_nest/models/chat_user.dart';
 import 'package:chat_nest/models/message.dart';
@@ -30,8 +28,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // for handling message text changes
   final textController = TextEditingController();
-  // for storing value of showing or hiding emoji
-  bool showEmoji = false;
+  // showEmoji for storing value of showing or hiding emoji
+  // isUploading for checking if image is uploading or not
+  bool showEmoji = false, isUploading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +93,16 @@ class _ChatScreenState extends State<ChatScreen> {
                   },
                 ),
               ),
+
+
+              // progress indicator for showing uploading
+              if(isUploading)
+                Align(
+                  alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8 , horizontal: 20),
+                      child: CircularProgressIndicator(strokeWidth: 2,),
+                    )),
               // chat input field
               ChatInput(),
               // show emojis on keyboard emoji button click and viseversa
@@ -176,12 +185,15 @@ class _ChatScreenState extends State<ChatScreen> {
                   // pick image from gallery button
                   IconButton(onPressed: () async {
                     final ImagePicker picker = ImagePicker();
-                    // Pick an image.
+                    // Pick multiple images.
                     final List<XFile>? images =
                       await picker.pickMultiImage(imageQuality: 70);
+                    // uploading and sending image one by one
                     for(var i in images!){   //=================================================*****may be remove ! after image =================================================*****
                       log('Image path : ${i.path}');
+                      setState(() => isUploading = true);
                       await APIs.sendChatImage(widget.user,File(i.path));
+                      setState(() => isUploading = false);
                     }
                   }, icon: Icon(Icons.image,color: Colors.blueAccent,size: 26,)),
                   // take image from camera button
@@ -194,6 +206,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       log('Image path : ${image.path}');
 
                       await APIs.sendChatImage(widget.user,File(image.path));
+                      setState(() => isUploading = false);
                     }
                   }, icon: Icon(Icons.camera_alt_rounded,color: Colors.blueAccent,size: 26,)),
 

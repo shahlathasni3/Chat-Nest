@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_nest/api/apis.dart';
 import 'package:flutter/cupertino.dart';
@@ -54,7 +52,10 @@ class _messageCardState extends State<messageCard> {
                   borderRadius: BorderRadius.circular(15),
                   child: CachedNetworkImage(
                     imageUrl: widget.message.msg,
-                    placeholder: (context, url) => CircularProgressIndicator(strokeWidth: 2,),
+                    placeholder: (context, url) => Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(strokeWidth: 2,),
+                    ),
                     errorWidget: (context, url, error) => const Icon(Icons.image,size: 70,),
                   ),
                 ),
@@ -109,7 +110,10 @@ class _messageCardState extends State<messageCard> {
               borderRadius: BorderRadius.circular(15),
               child: CachedNetworkImage(
                 imageUrl: widget.message.msg,
-                placeholder: (context, url) => CircularProgressIndicator(strokeWidth: 2,),
+                placeholder: (context, url) => Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(strokeWidth: 2,),
+                ),
                 errorWidget: (context, url, error) => const Icon(Icons.image,size: 70,),
               ),
             ),

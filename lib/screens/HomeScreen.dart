@@ -2,7 +2,6 @@ import 'package:chat_nest/models/chat_user.dart';
 import 'package:chat_nest/screens/profile_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../api/apis.dart';
@@ -108,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           body: StreamBuilder(
-              stream: APIs.getAllUsers(),
+              stream: APIs.firestore.collection('user').snapshots(),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   // if data is loading
@@ -121,8 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   case ConnectionState.active:
                   case ConnectionState.done:
                     final data = snapshot.data?.docs;
-                    list = data?.map((e) => ChatUser.fromJson(e.data())).toList() ??
-                        [];
+                    list = data?.map((e) => ChatUser.fromJson(e.data())).toList() ?? [];
 
 
                     if (list.isNotEmpty) {
@@ -135,7 +133,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               user: isSearching ? SearchList[index]:list[index],
                             );
                           // return Text('Name:${list[index]}');
-                          });
+                          },
+                      );
                     } else {
                       return Center(
                           child: Text(

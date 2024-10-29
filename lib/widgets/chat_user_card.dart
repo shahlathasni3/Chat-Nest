@@ -16,7 +16,6 @@ class Cat_user_card extends StatefulWidget {
   @override
   State<Cat_user_card> createState() => _Cat_user_cardState();
 }
-
 class _Cat_user_cardState extends State<Cat_user_card> {
 
   // last message info(if null --> no message)
